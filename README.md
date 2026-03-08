@@ -40,17 +40,22 @@ Then open http://localhost:5000 in your browser.
 For development/testing you can also use python app.py directly.
 
 
-⚠️ Configure qBittorrent Before You Start
-Flame TV will queue every missing episode for every show you add. On a show like The Simpsons that's 700+ episodes. If qBittorrent isn't configured sensibly it will try to download all of them at once.
-Before adding any shows, set these in qBittorrent (Tools → Options):
+⚠️ qBittorrent MUST be configured BEFORE adding shows
 
-Max active downloads — set to 5 or less
-Max active torrents — set to something reasonable (20-50)
-Global download speed limit — set to whatever your connection can handle
-Global upload speed limit — be a good citizen, don't set to 0
+Flame TV will happily queue **every missing episode** for every show you add.
 
-qBittorrent → Options → BitTorrent → also consider enabling "Do not count slow torrents" so stalled torrents don't block active ones.
-If you just point Flame TV at an unconfigured qBittorrent instance and add The Simpsons, don't say we didn't warn you. 🔥
+On a show like **The Simpsons** (700–800 missing episodes possible), that means **hundreds of torrents queued at once** if qB is not throttled.
+
+**Before you add your first show, set these in qBittorrent (Tools → Options):**
+
+- **Max active downloads** — set to **5** or less  
+- **Max active torrents** — set to **20–50** max  
+- **Global download speed limit** — whatever your connection can actually handle  
+- **Global upload speed limit** — be a good citizen, don't set to 0  
+
+Also consider: BitTorrent → "Do not count slow torrents" so stalled ones don't block your queue.
+
+**If you skip this and add The Simpsons anyway… don't say we didn't warn you. 🔥**
 
 
 Go to Settings and fill in your Prowlarr URL + API key, qBittorrent details, and media root path
