@@ -26,3 +26,7 @@ desktop.ini
 # Secrets — just in case
 *.env
 .env
+
+dist/
+build/
+*.spec
