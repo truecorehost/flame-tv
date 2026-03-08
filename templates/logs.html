@@ -2,9 +2,12 @@
 {% block content %}
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
   <h1>📋 Logs</h1>
-  <form method="post" action="/logs/clear" onsubmit="return confirm('Clear all logs?')">
-    <button class="btn btn-plain" style="font-size:12px;">Clear Logs</button>
-  </form>
+  <div style="display:flex; gap:8px;">
+    <a href="/logs/download" class="btn btn-plain" style="font-size:12px;">⬇ Download Log</a>
+    <form method="post" action="/logs/clear" onsubmit="return confirm('Clear all logs?')">
+      <button class="btn btn-plain" style="font-size:12px;">Clear Logs</button>
+    </form>
+  </div>
 </div>
 
 {% if not lines %}
