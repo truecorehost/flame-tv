@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>My Shows</h1>
+
+{% if not shows %}
+<p style="color:#888">No shows yet. Use the search bar to add one.</p>
+{% endif %}
+
+<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:8px;">
+{% for show in shows %}
+<div style="background:#1a1a1a; border-radius:8px; overflow:hidden; display:flex; flex-direction:row;">
+
+  <!-- Poster: fixed 100x150 portrait -->
+  <a href="/show/{{ show[0] }}" style="display:block; flex-shrink:0; width:100px; height:150px;">
+    {% if show[8] %}
+    <img src="{{ show[8] }}" alt="{{ show[1] }}" style="width:100px; height:150px; object-fit:cover; object-position:center top; display:block;">
+    {% else %}
+    <div style="width:100px; height:150px; background:#222; display:flex; align-items:center; justify-content:center; color:#444; font-size:36px;">🎬</div>
+    {% endif %}
+  </a>
+
+  <!-- Info panel beside poster -->
+  <div style="padding:10px 12px; flex:1; display:flex; flex-direction:column; gap:6px; min-width:0;">
+    <div>
+      <a href="/show/{{ show[0] }}" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">{{ show[1] }}</a>
+      <span style="color:#555; font-size:11px;">{{ show[2] or '' }}</span>
+    </div>
+
+    <div style="font-size:12px;">
+      <span style="color:{% if show[3]=='Continuing' %}#4c4{% else %}#888{% endif %}">{{ show[3] or '—' }}</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+      <span><span class="badge badge-have">{{ show[4] }}</span> <span style="color:#555">have</span></span>
+      <span><span class="badge badge-want">{{ show[5] }}</span> <span style="color:#555">wanted</span></span>
+      {% if show[6] > 0 %}
+      <span><span class="badge badge-dl">{{ show[6] }}</span> <span style="color:#555">dl</span></span>
+      {% endif %}
+    </div>
+
+    <div style="margin-top:auto; display:flex; gap:6px; flex-wrap:wrap;">
+      <button class="btn btn-grab" type="button"
+              style="font-size:11px; padding:3px 8px;"
+              onclick="grabNext({{ show[0] }}, this)">
+        Get Next
+      </button>
+
+      <button class="btn btn-grab" type="button"
+              style="font-size:11px; padding:3px 8px;"
+              onclick="grabMissing({{ show[0] }}, this)">
+        Get Missing
+      </button>
+
+      <form method="post" action="/remove/{{ show[0] }}"
+            onsubmit="return confirm('Remove {{ show[1] }}?')"
+            style="display:inline;">
+        <button class="btn btn-plain" type="submit"
+                style="font-size:11px; padding:3px 8px;">
+          Remove
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endfor %}
+</div>
+
+<script>
+function grabNext(showId, btn) {
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  fetch('/grab/next/' + showId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        btn.textContent = 'Queued';
+        btn.style.background = '#4c4';
+        setTimeout(() => window.location.reload(), 700);
+      } else {
+        btn.textContent = 'None';
+        btn.style.background = '#666';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = oldText;
+          btn.style.background = '';
+        }, 1000);
+      }
+    })
+    .catch(() => {
+      btn.textContent = 'Failed';
+      btn.style.background = '#f44';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        btn.style.background = '';
+      }, 1200);
+    });
+}
+
+function grabMissing(showId, btn) {
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Queueing';
+
+  fetch('/grab/missing/' + showId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.queued > 0) {
+        btn.textContent = 'Queued ' + data.queued;
+        btn.style.background = '#4c4';
+        setTimeout(() => window.location.reload(), 900);
+      } else {
+        btn.textContent = 'None';
+        btn.style.background = '#666';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = oldText;
+          btn.style.background = '';
+        }, 1000);
+      }
+    })
+    .catch(() => {
+      btn.textContent = 'Failed';
+      btn.style.background = '#f44';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        btn.style.background = '';
+      }, 1200);
+    });
+}
+</script>
+{% endblock %}

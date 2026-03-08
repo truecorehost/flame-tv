@@ -1,0 +1,28 @@
+# Database and logs — user data, never commit
+flame-tv.db
+flame-tv.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+
+# Secrets — just in case
+*.env
+.env
