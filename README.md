@@ -1,20 +1,115 @@
-# Flame TV
+🔥 Flame TV
+A lightweight, self-hosted TV show manager. Automatically finds, downloads, and organises your TV library — without the bloat.
+Built by TrueCore / Flame Software
 
-Lean local TV downloader. Replaces Sonarr.
+Why Flame TV?
+Most TV managers are massive. Sonarr runs at 300MB+ RAM, requires .NET, and comes with a sprawling config system most people never touch.
+Flame TV does the same job in ~50MB, runs on plain Python, and gives you exactly what you need — nothing more.
 
----
+🔍 Searches via Prowlarr (supports all your indexers)
+⬇️ Downloads via qBittorrent
+📁 Automatically renames and organises files into Show/Season X/ folders
+📅 Tracks what you have, what's missing, and what's airing next
+🖼️ Poster artwork from TVDB
+📊 Live stats and human-readable logs
+⚙️ All config via a web UI — no file editing required
 
-## Quick Start (Windows build)
 
-1. Extract the zip
-2. Run `FlameTV.exe`
-3. Open http://127.0.0.1:5000 in your browser
-4. Go to **Settings**
-5. Enter:
-   - Prowlarr URL + API key
-   - qBittorrent URL + login
-   - Media Root path
+Requirements
 
-Flame TV will create its database automatically on first run.
+Python 3.9+
+Prowlarr — for torrent indexing
+qBittorrent with Web UI enabled
+A TVDB API key (free)
 
-Logs are written to `flame-tv.log` in the same folder.
+
+Installation
+1. Clone the repo
+bashgit clone https://github.com/YOUR_USERNAME/flame-tv.git
+cd flame-tv
+2. Install dependencies
+bashpip install -r requirements.txt
+3. Configure
+Open config.py and set your TVDB API key:
+pythonTVDB_API_KEY = "your-key-here"
+Everything else (Prowlarr URL, qBit credentials, media paths) is configured through the web UI after first run.
+4. Run
+bashpython run_flame_tv.py
+Then open http://localhost:5000 in your browser.
+
+For development/testing you can also use python app.py directly.
+
+
+⚠️ Configure qBittorrent Before You Start
+Flame TV will queue every missing episode for every show you add. On a show like The Simpsons that's 700+ episodes. If qBittorrent isn't configured sensibly it will try to download all of them at once.
+Before adding any shows, set these in qBittorrent (Tools → Options):
+
+Max active downloads — set to 5 or less
+Max active torrents — set to something reasonable (20-50)
+Global download speed limit — set to whatever your connection can handle
+Global upload speed limit — be a good citizen, don't set to 0
+
+qBittorrent → Options → BitTorrent → also consider enabling "Do not count slow torrents" so stalled torrents don't block active ones.
+If you just point Flame TV at an unconfigured qBittorrent instance and add The Simpsons, don't say we didn't warn you. 🔥
+
+
+Go to Settings and fill in your Prowlarr URL + API key, qBittorrent details, and media root path
+Use the Search bar to add your first show
+Flame TV will fetch all episode data from TVDB automatically
+Hit Get Missing on any show to start grabbing episodes
+
+
+How It Works
+Prowlarr (indexers) → Flame TV → qBittorrent → organised media folder
+                          ↕
+                       TVDB API
+                      (metadata)
+
+Every 30 minutes, Flame TV checks for newly aired episodes and queues them automatically
+Every 15 minutes, it checks qBittorrent for completed downloads and organises them
+Files are renamed to Show Name - SXXEXX - Episode Title.ext and moved to your media root
+
+
+Directory Structure
+C:\flame-tv\          (or wherever you clone it)
+  app.py              Flask web app + all routes
+  config.py           Default config (TVDB key lives here)
+  settings.py         DB-driven settings loader
+  metadata.py         TVDB API — show/episode data + posters
+  downloader.py       Prowlarr search + qBit integration
+  organiser.py        File renaming + moving
+  scanner.py          Scan existing media folder
+  worker.py           Background polling (downloads, auto-grab)
+  run_flame_tv.py     Production runner (Waitress WSGI)
+  init_db.py          Database setup + migrations
+  requirements.txt
+  templates/          Jinja2 HTML templates
+  flame-tv.db         SQLite database (auto-created, not in git)
+  flame-tv.log        Log file (auto-created, not in git)
+
+Media Organisation
+Flame TV expects (and creates) this folder structure:
+D:\Media\TV\
+  Show Name\
+    Season 1\
+      Show Name - S01E01 - Episode Title.mkv
+    Season 2\
+      ...
+Compatible with Jellyfin, Plex, and Emby out of the box.
+
+Alpha Notes
+This is early software. It works well but expect rough edges. If something breaks, check Logs in the UI first — errors are logged in plain English.
+Known limitations:
+
+No multi-episode file support yet
+Specials (Season 0) handling is basic
+No duplicate detection (yet)
+
+
+Contributing
+PRs welcome. Keep it lean — the whole point is that this doesn't become Sonarr.
+
+Licence
+MIT — do what you like with it.
+
+Built with 🔥 by TrueCore / Flame Software
